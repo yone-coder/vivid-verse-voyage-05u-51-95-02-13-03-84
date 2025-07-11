@@ -1,5 +1,5 @@
 
-const BACKEND_URL = 'https://google-oauth-backend-2uta.onrender.com';
+const BACKEND_URL = 'https://supabase-y8ak.onrender.com/api';
 
 export const authService = {
   // Check if user is authenticated with the backend using HTTP-only cookies
