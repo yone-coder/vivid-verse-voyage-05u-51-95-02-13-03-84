@@ -3,75 +3,72 @@ import { ArrowLeft, Lock, Check, HelpCircle, Eye, EyeOff, Mail, Loader2 } from '
 import { FAVICON_OVERRIDES } from '../../constants/email';
 
 interface PasswordAuthScreenProps {
-email: string;
-onBack: () => void;
-onSignInSuccess: () => void;
-onForgotPasswordClick: () => void; // ➕ Add this
+  email: string;
+  onBack: () => void;
+  onSignInSuccess: () => void;
+  onForgotPasswordClick: () => void; // ➕ Add this
 }
 
 const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
-email,
-onBack,
-onSignInSuccess,
-onForgotPasswordClick // ✅ add it here
+  email,
+  onBack,
+  onSignInSuccess,
+  onForgotPasswordClick // ✅ add it here
 }) => {
-const [password, setPassword] = useState('');
-const [showPassword, setShowPassword] = useState(false);
-const [isPasswordValid, setIsPasswordValid] = useState(false);
-const [isLoading, setIsLoading] = useState(false);
-const [error, setError] = useState<string>('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string>('');
 
-const passwordInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
-const API_BASE_URL = 'https://supabase-y8ak.onrender.com/api';
+  const API_BASE_URL = 'https://supabase-y8ak.onrender.com/api';
 
-const handlePasswordChange = (value: string) => {
-setPassword(value);
-setIsPasswordValid(value.length >= 8);
-setError(''); // Clear any previous errors
-};
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    setIsPasswordValid(value.length >= 8);
+    setError(''); // Clear any previous errors
+  };
 
-const handleSignIn = async () => {
-if (!isPasswordValid || isLoading) return;
+  const handleSignIn = async () => {
+    if (!isPasswordValid || isLoading) return;
 
-setIsLoading(true);  
-setError('');  
+    setIsLoading(true);
+    setError('');
 
-try {  
-  const response = await fetch(`${API_BASE_URL}/signin`, {  
-    method: 'POST',  
-    headers: {  
-      'Content-Type': 'application/json',  
-    },  
-    body: JSON.stringify({  
-      email: email,  
-      password: password  
-    }),  
-  });  
+    try {
+      const response = await fetch(`${API_BASE_URL}/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        }),
+      });
 
-  const data = await response.json();  
+      const data = await response.json();
 
-  if (response.ok) {  
-    onSignInSuccess();  
-  } else {  
-    setError(data.message || 'Invalid email or password. Please try again.');  
-    setPassword('');  
-    setIsPasswordValid(false);  
-    passwordInputRef.current?.focus();  
-  }  
-} catch (error) {  
-  console.error('Error signing in:', error);  
-  setError('Network error. Please check your connection and try again.');  
-} finally {  
-  setIsLoading(false);  
-}
+      if (response.ok) {
+        onSignInSuccess();
+      } else {
+        setError(data.message || 'Invalid email or password. Please try again.');
+        setPassword('');
+        setIsPasswordValid(false);
+        passwordInputRef.current?.focus();
+      }
+    } catch (error) {
+      console.error('Error signing in:', error);
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-};
-
-const domain = email.split('@')[1] || '';
-const faviconUrl = FAVICON_OVERRIDES[domain] || https://www.google.com/s2/favicons?domain=${domain};
-
-
+  const domain = email.split('@')[1] || '';
+  const faviconUrl = FAVICON_OVERRIDES[domain] || `https://www.google.com/s2/favicons?domain=${domain}`;
 
   return (
     <div className="min-h-screen bg-white flex flex-col px-4">
