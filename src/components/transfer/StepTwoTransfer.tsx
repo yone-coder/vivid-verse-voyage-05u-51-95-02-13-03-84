@@ -1,9 +1,8 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Phone } from 'lucide-react';
 
 interface ReceiverDetails {
   firstName: string;
@@ -132,8 +131,11 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
                   <Label htmlFor="phoneNumber" className="text-base font-medium text-gray-700">
                     What's their phone number?
                   </Label>
-                  <div className="flex">
-                    <div className="flex items-center px-3 border border-r-0 border-gray-300 bg-gradient-to-r from-gray-50 to-gray-100 rounded-l-lg">
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center">
+                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-2">
+                        <Phone className="h-3 w-3 text-white" />
+                      </div>
                       <span className="text-sm text-gray-600 font-medium">+509</span>
                     </div>
                     <Input
@@ -142,7 +144,7 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
                       placeholder="Enter phone number"
                       value={receiverDetails.phoneNumber}
                       onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                      className="rounded-l-none border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="pl-20 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -154,8 +156,11 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
                   <Label htmlFor="moncashPhoneNumber" className="text-base font-medium text-gray-700">
                     What's their {paymentMethod} phone number?
                   </Label>
-                  <div className="flex">
-                    <div className="flex items-center px-3 border border-r-0 border-gray-300 bg-gradient-to-r from-gray-50 to-gray-100 rounded-l-lg">
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center">
+                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-2">
+                        <Phone className="h-3 w-3 text-white" />
+                      </div>
                       <span className="text-sm text-gray-600 font-medium">+509</span>
                     </div>
                     <Input
@@ -164,7 +169,7 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
                       placeholder={`Enter ${paymentMethod} phone number`}
                       value={receiverDetails.moncashPhoneNumber || ''}
                       onChange={(e) => handleInputChange('moncashPhoneNumber', e.target.value)}
-                      className="rounded-l-none border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="pl-20 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
 
@@ -182,12 +187,9 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
                 </div>
               )}
             </div>
-
-
         </div>
       </div>
     </div>
   );
 };
-
 export default StepTwoTransfer;
