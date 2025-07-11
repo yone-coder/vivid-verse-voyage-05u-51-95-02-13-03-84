@@ -9,6 +9,7 @@ import TrackTransferPage from "@/pages/TrackTransferPage";
 import LocationsPage from "@/pages/LocationsPage";
 import AccountPage from "@/pages/AccountPage";
 import ComponentsPage from "@/pages/ComponentsPage";
+import HelloPage from "@/pages/HelloPage";
 import NotFound from "@/components/NotFound";
 import SignInScreen from "@/components/auth/SignInScreen";
 import OAuthCallback from "@/components/auth/OAuthCallback";
@@ -81,6 +82,10 @@ export const router = createBrowserRouter([
       { 
         path: "components", 
         element: <ComponentsPage />
+      },
+      { 
+        path: "hello", 
+        element: <HelloPage />
       },
       { path: "*", element: <NotFound /> },
     ],
