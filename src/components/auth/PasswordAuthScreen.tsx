@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { ArrowLeft, Lock, Check, HelpCircle, Eye, EyeOff, Mail, Loader2 } from 'lucide-react';
 import { FAVICON_OVERRIDES } from '../../constants/email';
@@ -7,14 +6,14 @@ interface PasswordAuthScreenProps {
   email: string;
   onBack: () => void;
   onSignInSuccess: () => void;
-  onForgotPasswordClick: () => void; // ➕ Add this
+  onForgotPasswordClick: () => void;
 }
 
 const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({ 
   email, 
   onBack, 
   onSignInSuccess,
-  onForgotPasswordClick // ✅ add it here
+  onForgotPasswordClick
 }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +28,7 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
   const handlePasswordChange = (value: string) => {
     setPassword(value);
     setIsPasswordValid(value.length >= 8);
-    setError(''); // Clear any previous errors
+    setError('');
   };
 
   const handleSignIn = async () => {
@@ -44,6 +43,7 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           email: email,
           password: password
@@ -53,6 +53,13 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
       const data = await response.json();
 
       if (response.ok) {
+        console.log('Authentication successful - session cookie set by backend');
+        
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('user', JSON.stringify({ email }));
+        
+        window.dispatchEvent(new Event('authStateChanged'));
+        
         onSignInSuccess();
       } else {
         setError(data.message || 'Invalid email or password. Please try again.');
@@ -73,7 +80,6 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
 
   return (
     <div className="min-h-screen bg-white flex flex-col px-4">
-      {/* Header */}
       <div className="pt-2 pb-3 flex items-center justify-between">
         <button
           onClick={onBack}
@@ -99,7 +105,6 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
         </button>
       </div>
 
-      {/* Progress Bar */}
       <div className="mb-4 px-0">
         <div className="flex items-center gap-2 mb-2">
           <div className="flex-1 h-1 bg-red-500 rounded-full"></div>
@@ -109,7 +114,6 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
         </div>
       </div>
 
-      {/* Main content container */}
       <div className="flex-1 flex flex-col w-full max-w-md mx-auto relative">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-semibold text-gray-900 mb-2">
@@ -120,7 +124,6 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
           </p>
         </div>
 
-        {/* Email display */}
         <div className="mb-4">
           <div className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center gap-3">
@@ -150,14 +153,12 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
           </div>
         </div>
 
-        {/* Error message */}
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-red-600 text-sm text-center">{error}</p>
           </div>
         )}
 
-        {/* Password input */}
         <div className="mb-6 relative">
           <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
             Password
@@ -226,19 +227,19 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
 
         <div className="text-center">
           <button 
-  className="text-red-500 font-medium hover:text-red-600 mb-4 disabled:opacity-50" 
-  type="button"
-  disabled={isLoading}
-  onClick={onForgotPasswordClick}
->
-  Forgot password?
-</button>
+            className="text-red-500 font-medium hover:text-red-600 mb-4 disabled:opacity-50" 
+            type="button"
+            disabled={isLoading}
+            onClick={onForgotPasswordClick}
+          >
+            Forgot password?
+          </button>
 
           <div className="flex items-center justify-center gap-2">
             <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M18,8A6,6 0 0,0 12,2A6,6 0 0,0 6,8H4C2.89,8 2,8.89 2,10V20A2,2 0 0,0 4,22H20A2,2 0 0,0 22,20V10C22,8.89 21.1,8 20,8H18M12,4A4,4 0 0,1 16,8H8A4,4 0 0,1 12,4Z"/>
             </svg>
-            <span className="text-gray-500 text-sm">Your password is secure with us</span>
+            <span className="text-gray-500 text-sm">Your session is secured with HTTP-only cookies</span>
           </div>
         </div>
       </div>
