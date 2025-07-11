@@ -1,19 +1,20 @@
 import React, { useState, useRef } from 'react';
 import { ArrowLeft, Lock, Check, HelpCircle, Eye, EyeOff, Mail, Loader2 } from 'lucide-react';
 import { FAVICON_OVERRIDES } from '../../constants/email';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PasswordAuthScreenProps {
   email: string;
   onBack: () => void;
   onSignInSuccess: () => void;
-  onForgotPasswordClick: () => void; // ➕ Add this
+  onForgotPasswordClick: () => void;
 }
 
 const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
   email,
   onBack,
   onSignInSuccess,
-  onForgotPasswordClick // ✅ add it here
+  onForgotPasswordClick
 }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,6 +23,7 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
   const [error, setError] = useState<string>('');
 
   const passwordInputRef = useRef<HTMLInputElement>(null);
+  const { login } = useAuth();
 
   const API_BASE_URL = 'https://supabase-y8ak.onrender.com/api';
 
@@ -52,6 +54,18 @@ const PasswordAuthScreen: React.FC<PasswordAuthScreenProps> = ({
       const data = await response.json();
 
       if (response.ok) {
+        console.log('Sign in successful, storing token and user data');
+        
+        // Use the login function from AuthContext to handle token storage
+        // and authentication state management
+        const userData = {
+          id: data.user?.id || data.id,
+          email: email,
+          full_name: data.user?.full_name || data.full_name,
+          profile_picture: data.user?.profile_picture || data.profile_picture
+        };
+        
+        login(userData, data.token);
         onSignInSuccess();
       } else {
         setError(data.message || 'Invalid email or password. Please try again.');
