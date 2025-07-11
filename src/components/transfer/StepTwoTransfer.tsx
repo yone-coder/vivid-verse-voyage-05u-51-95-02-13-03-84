@@ -131,24 +131,34 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
 
         {/* Regular Phone Number Field */}
         {!isMonCashOrNatCash && (
-          <div className="mt-5 space-y-1">
-            <Label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700">
-              What's their phone number?
-            </Label>
-            <div className="flex mt-1">
-              <div className="flex items-center px-3 border border-r-0 border-gray-300 bg-gray-50 rounded-l-md text-gray-600 text-sm">
-                +509
-              </div>
-              <Input
-                id="phoneNumber"
-                type="tel"
-                placeholder="Enter phone number"
-                value={receiverDetails.phoneNumber}
-                onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                className="rounded-l-none border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-          </div>
+         {/* PHONE NUMBER FIELD – Shared Style */}
+<div className="space-y-1">
+  <Label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700">
+    {isMonCashOrNatCash ? `What's their ${paymentMethod} phone number?` : `What's their phone number?`}
+  </Label>
+  <div className="relative mt-1 flex rounded-md shadow-sm">
+    <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-600 text-sm">
+      +509
+    </span>
+    <Input
+      id={isMonCashOrNatCash ? 'moncashPhoneNumber' : 'phoneNumber'}
+      type="tel"
+      placeholder="1234-5678"
+      value={
+        isMonCashOrNatCash
+          ? receiverDetails.moncashPhoneNumber || ''
+          : receiverDetails.phoneNumber
+      }
+      onChange={(e) =>
+        handleInputChange(
+          isMonCashOrNatCash ? 'moncashPhoneNumber' : 'phoneNumber',
+          e.target.value
+        )
+      }
+      className="rounded-none rounded-r-md border-gray-300 focus:border-blue-500 focus:ring-blue-500 w-full"
+    />
+  </div>
+</div>
         )}
 
         {/* MonCash/NatCash Phone Number Field */}
