@@ -67,14 +67,14 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
   const handleDepartmentChange = (value: string) => {
     console.log('Department change handler called with:', value);
     console.log('Current receiverDetails before change:', receiverDetails);
-    
+
     // Update department and reset commune
     const updatedDetails = {
       ...receiverDetails,
       department: value,
       commune: '' // Reset commune when department changes
     };
-    
+
     console.log('Updated details after department change:', updatedDetails);
     onDetailsChange(updatedDetails);
   };
@@ -90,88 +90,102 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
   const paymentMethod = transferDetails?.deliveryMethod === 'moncash' ? 'MonCash' : 'NatCash';
 
   return (
-   <div className="p-4 bg-gray-50 min-h-screen">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Receiver Details</h2>
+    <div className="">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-3 text-center">
+          <h2 className="text-2xl font-bold text-gray-800 mb-1">Receiver Details</h2>
           <p className="text-gray-600">Please provide the recipient's information</p>
         </div>
 
-        <div className="space-y-4">
-          {/* Personal Information Card */}
-          <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl border border-blue-100 shadow-sm p-4 space-y-4">
-            <h3 className="text-lg font-medium text-gray-800 mb-2 pb-2 border-b border-blue-100">Personal Information</h3>
+        <div className="space-y-2">
+            {/* Personal Information Fields */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium text-gray-800 mb-1 pb-1">Personal Information</h3>
 
-            <div className="space-y-3">
-              <Label htmlFor="firstName" className="text-base font-medium text-gray-700">
-                What's their full name?
-              </Label>
-              <div className="grid grid-cols-2 gap-3">
-                <Input
-                  id="firstName"
-                  type="text"
-                  placeholder="First name"
-                  value={receiverDetails.firstName}
-                  onChange={(e) => handleInputChange('firstName', e.target.value)}
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
-                <Input
-                  id="lastName"
-                  type="text"
-                  placeholder="Last name"
-                  value={receiverDetails.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Regular phone number field - hide for MonCash/NatCash */}
-            {!isMonCashOrNatCash && (
-              <PhoneInput
-                id="phoneNumber"
-                label="What's their phone number?"
-                placeholder="Enter phone number"
-                value={receiverDetails.phoneNumber || ''}
-                onChange={(value) => handleInputChange('phoneNumber', value)}
-                helperText="Enter a valid Haiti mobile number"
-                isRequired={true}
-                showValidation={true}
-              />
-            )}
-
-            {/* MonCash/NatCash Phone Number Field */}
-            {isMonCashOrNatCash && (
-              <div className="space-y-4">
-                <PhoneInput
-                  id="moncashPhoneNumber"
-                  label={`What's their ${paymentMethod} phone number?`}
-                  placeholder={`Enter ${paymentMethod} phone number`}
-                  value={receiverDetails.moncashPhoneNumber || ''}
-                  onChange={(value) => handleInputChange('moncashPhoneNumber', value)}
-                  helperText={`Enter the phone number linked to their ${paymentMethod} account`}
-                  isRequired={true}
-                  showValidation={true}
-                />
-
-                {/* Notice about account eligibility */}
-                <div className="flex items-start space-x-2 p-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg">
-                  <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-amber-800">
-                    <p className="font-medium mb-1">Important Notice</p>
-                    <p>
-                      Please ensure the {paymentMethod} phone number is eligible to receive payments and the account is upgraded. 
-                      Unverified or basic accounts may not be able to receive transfers.
-                    </p>
-                  </div>
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-base font-medium text-gray-700">
+                  What's their full name?
+                </Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="First name"
+                    value={receiverDetails.firstName}
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="Last name"
+                    value={receiverDetails.lastName}
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
                 </div>
               </div>
-            )}
-          </div>
+
+              {/* Conditionally render regular phone number field - hide for MonCash/NatCash */}
+              {!isMonCashOrNatCash && (
+                <div className="space-y-2">
+                  <Label htmlFor="phoneNumber" className="text-base font-medium text-gray-700">
+                    What's their phone number?
+                  </Label>
+                  <div className="flex">
+                    <div className="flex items-center px-3 border border-r-0 border-gray-300 bg-gradient-to-r from-gray-50 to-gray-100 rounded-l-lg">
+                      <span className="text-sm text-gray-600 font-medium">+509</span>
+                    </div>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      placeholder="Enter phone number"
+                      value={receiverDetails.phoneNumber}
+                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      className="rounded-l-none border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* MonCash/NatCash Phone Number Field */}
+              {isMonCashOrNatCash && (
+                <div className="space-y-2">
+                  <Label htmlFor="moncashPhoneNumber" className="text-base font-medium text-gray-700">
+                    What's their {paymentMethod} phone number?
+                  </Label>
+                  <div className="flex">
+                    <div className="flex items-center px-3 border border-r-0 border-gray-300 bg-gradient-to-r from-gray-50 to-gray-100 rounded-l-lg">
+                      <span className="text-sm text-gray-600 font-medium">+509</span>
+                    </div>
+                    <Input
+                      id="moncashPhoneNumber"
+                      type="tel"
+                      placeholder={`Enter ${paymentMethod} phone number`}
+                      value={receiverDetails.moncashPhoneNumber || ''}
+                      onChange={(e) => handleInputChange('moncashPhoneNumber', e.target.value)}
+                      className="rounded-l-none border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  {/* Notice about account eligibility */}
+                  <div className="flex items-start space-x-2 p-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg">
+                    <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-amber-800">
+                      <p className="font-medium mb-1">Important Notice</p>
+                      <p>
+                        Please ensure the {paymentMethod} phone number is eligible to receive payments and the account is upgraded. 
+                        Unverified or basic accounts may not be able to receive transfers.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+
         </div>
       </div>
     </div>
   );
 };
-
-export default StepTwoTransfer;
