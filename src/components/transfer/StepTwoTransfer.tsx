@@ -90,17 +90,17 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
   const paymentMethod = transferDetails?.deliveryMethod === 'moncash' ? 'MonCash' : 'NatCash';
 
   return (
-    <div className="p-1">
-      <div className="max-w-2xl mx-auto">
+    <div className="">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-3 text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-1">Receiver Details</h2>
           <p className="text-gray-600">Please provide the recipient's information</p>
         </div>
 
         <div className="space-y-2">
-            {/* Personal Information Card */}
-            <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl border border-blue-100 shadow-sm p-2 space-y-2">
-              <h3 className="text-lg font-medium text-gray-800 mb-1 pb-1 border-b border-blue-100">Personal Information</h3>
+            {/* Personal Information Fields */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium text-gray-800 mb-1 pb-1">Personal Information</h3>
 
               <div className="space-y-2">
                 <Label htmlFor="firstName" className="text-base font-medium text-gray-700">
@@ -183,59 +183,7 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
               )}
             </div>
 
-            {/* Location Information Card */}
-            <div className="bg-gradient-to-br from-white to-purple-50/30 rounded-xl border border-purple-100 shadow-sm p-2 space-y-2">
-              <h3 className="text-lg font-medium text-gray-800 mb-1 pb-1 border-b border-purple-100">Location Information</h3>
 
-              <div className="space-y-2">
-                <Label htmlFor="department" className="text-base font-medium text-gray-700">
-                  Which department are they in?
-                </Label>
-                <Select 
-                  value={receiverDetails.department || ""} 
-                  onValueChange={handleDepartmentChange}
-                >
-                  <SelectTrigger className="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                    <SelectValue placeholder="Select department" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white z-50">
-                    {haitiDepartments.map((dept) => (
-                      <SelectItem 
-                        key={dept} 
-                        value={dept}
-                      >
-                        {dept}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="commune" className="text-base font-medium text-gray-700">
-                  Which city or commune are they in?
-                </Label>
-                <Select 
-                  value={receiverDetails.commune || ""} 
-                  onValueChange={handleCommuneChange}
-                  disabled={!receiverDetails.department}
-                >
-                  <SelectTrigger className="w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100">
-                    <SelectValue placeholder={receiverDetails.department ? "Select commune" : "Select department first"} />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white z-50">
-                    {receiverDetails.department && communesByDepartment[receiverDetails.department]?.map((commune) => (
-                      <SelectItem 
-                        key={commune} 
-                        value={commune}
-                      >
-                        {commune}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-          </div>
         </div>
       </div>
     </div>
