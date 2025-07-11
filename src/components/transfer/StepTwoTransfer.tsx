@@ -1,9 +1,11 @@
 
-import React from 'react';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertCircle, PhoneInput} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { PhoneInput } from '@/components/ui/phone-input';
+import { Separator } from '@/components/ui/separator';
 
 interface ReceiverDetails {
   firstName: string;
@@ -11,181 +13,286 @@ interface ReceiverDetails {
   phoneNumber: string;
   department: string;
   commune: string;
-  email?: string;
-  moncashPhoneNumber?: string;
+  email: string;
+  moncashPhoneNumber: string;
+}
+
+interface TransferDetails {
+  receivingCountry: string;
+  deliveryMethod: string;
 }
 
 interface StepTwoTransferProps {
   receiverDetails: ReceiverDetails;
-  onDetailsChange: (details: ReceiverDetails) => void;
-  transferDetails?: {
-    deliveryMethod: string;
-  };
+  transferDetails: TransferDetails;
+  onReceiverDetailsChange: (details: ReceiverDetails) => void;
+  onNext: () => void;
+  onBack: () => void;
 }
 
-const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({ 
-  receiverDetails, 
-  onDetailsChange,
-  transferDetails 
+const HAITI_DEPARTMENTS = [
+  'Artibonite',
+  'Centre',
+  'Grand\'Anse',
+  'Nippes',
+  'Nord',
+  'Nord-Est',
+  'Nord-Ouest',
+  'Ouest',
+  'Sud',
+  'Sud-Est'
+];
+
+const COMMUNES_BY_DEPARTMENT: Record<string, string[]> = {
+  'Artibonite': ['Gonaïves', 'Saint-Marc', 'Dessalines', 'Gros-Morne', 'Ennery'],
+  'Centre': ['Hinche', 'Mirebalais', 'Lascahobas', 'Belladère', 'Boucan-Carré'],
+  'Grand\'Anse': ['Jérémie', 'Dame-Marie', 'Anse-d\'Hainault', 'Corail', 'Pestel'],
+  'Nippes': ['Miragoâne', 'Anse-à-Veau', 'Petit-Goâve', 'Baradères', 'Plaisance-du-Sud'],
+  'Nord': ['Cap-Haïtien', 'Fort-Dauphin', 'Grande-Rivière-du-Nord', 'Quartier-Morin', 'Limonade'],
+  'Nord-Est': ['Fort-Liberté', 'Ouanaminthe', 'Trou-du-Nord', 'Terrier-Rouge', 'Sainte-Suzanne'],
+  'Nord-Ouest': ['Port-de-Paix', 'Saint-Louis-du-Nord', 'Jean-Rabel', 'Môle-Saint-Nicolas', 'Bombardopolis'],
+  'Ouest': ['Port-au-Prince', 'Delmas', 'Pétion-Ville', 'Carrefour', 'Croix-des-Bouquets'],
+  'Sud': ['Les Cayes', 'Aquin', 'Saint-Louis-du-Sud', 'Cavaillon', 'Port-Salut'],
+  'Sud-Est': ['Jacmel', 'Marigot', 'Cayes-Jacmel', 'Bainet', 'Côtes-de-Fer']
+};
+
+const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
+  receiverDetails,
+  transferDetails,
+  onReceiverDetailsChange,
+  onNext,
+  onBack
 }) => {
-  const handleInputChange = (field: keyof ReceiverDetails, value: string) => {
-    console.log(`Updating ${field} with value:`, value);
-    const updatedDetails = {
-      ...receiverDetails,
-      [field]: value,
-    };
-    console.log('Updated details:', updatedDetails);
-    onDetailsChange(updatedDetails);
-  };
-
-  const haitiDepartments = [
-    "Artibonite",
-    "Centre",
-    "Grand'Anse",
-    "Nippes",
-    "Nord",
-    "Nord-Est",
-    "Nord-Ouest",
-    "Ouest",
-    "Sud",
-    "Sud-Est"
-  ];
-
-  const communesByDepartment: Record<string, string[]> = {
-    "Artibonite": ["Gonaïves", "Saint-Marc", "Dessalines", "Gros-Morne", "Ennery", "L'Estère", "Petite-Rivière-de-l'Artibonite", "Verrettes", "La Chapelle", "Marchand-Dessalines"],
-    "Centre": ["Hinche", "Mirebalais", "Lascahobas", "Belladère", "Savanette", "Boucan-Carré", "Thomassique", "Cerca-la-Source", "Thomonde", "Baptiste", "Cerca-Carvajal", "Maïssade"],
-    "Grand'Anse": ["Jérémie", "Abricots", "Anse-d'Hainault", "Corail", "Dame-Marie", "Les Irois", "Marfranc", "Moron", "Pestel", "Roseaux", "Beaumont", "Chambellan"],
-    "Nippes": ["Miragoâne", "Anse-à-Veau", "Arnaud", "Asile", "Barradères", "Fond-des-Nègres", "Grand-Boucan", "Petit-Trou-de-Nippes", "Plaisance-du-Sud", "L'Azile", "Baradères"],
-    "Nord": ["Cap-Haïtien", "Fort-Dauphin", "Grande-Rivière-du-Nord", "Quartier-Morin", "Limonade", "Plaine-du-Nord", "Dondon", "Saint-Raphaël", "Bahon", "Borgne", "Capotille", "La Victoire", "Limbe", "Milot", "Ouanaminthe", "Pignon", "Pilate", "Port-Margot", "Ranquitte", "Terrier-Rouge"],
-    "Nord-Est": ["Fort-Liberté", "Ouanaminthe", "Trou-du-Nord", "Terrier-Rouge", "Capotille", "Mont-Organisé", "Sainte-Suzanne", "Caracol", "Ferrier", "Mombin-Crochu", "Vallières"],
-    "Nord-Ouest": ["Port-de-Paix", "Bassin-Bleu", "Bombardopolis", "Chansolme", "Jean-Rabel", "Môle-Saint-Nicolas", "Saint-Louis-du-Nord", "Anse-à-Foleur", "La Tortue"],
-    "Ouest": ["Port-au-Prince", "Delmas", "Pétionville", "Carrefour", "Cité Soleil", "Tabarre", "Croix-des-Bouquets", "Kenscoff", "Gressier", "Léogâne", "Grand-Goâve", "Petit-Goâve", "Arcahaie", "Cabaret", "Cornillon", "Fonds-Verrettes", "Ganthier", "La Plaine", "Thomazeau", "Pointe-à-Raquette"],
-    "Sud": ["Les Cayes", "Aquin", "Saint-Louis-du-Sud", "Cavaillon", "Chardonnières", "Chantal", "Côteaux", "Port-à-Piment", "Roche-à-Bateau", "Torbeck", "Arniquet", "Campin", "Maniche", "Port-Salut", "Saint-Jean-du-Sud"],
-    "Sud-Est": ["Jacmel", "Marigot", "Cayes-Jacmel", "Bainet", "Côtes-de-Fer", "Grand-Gosier", "Anse-à-Pitres", "Belle-Anse", "Thiotte", "La Vallée", "Banatte", "Corail-Sourd"]
-  };
-
-  const handleDepartmentChange = (value: string) => {
-    console.log('Department change handler called with:', value);
-    console.log('Current receiverDetails before change:', receiverDetails);
-
-    // Update department and reset commune
-    const updatedDetails = {
-      ...receiverDetails,
-      department: value,
-      commune: '' // Reset commune when department changes
-    };
-
-    console.log('Updated details after department change:', updatedDetails);
-    onDetailsChange(updatedDetails);
-  };
-
-  const handleCommuneChange = (value: string) => {
-    console.log('Commune change handler called with:', value);
-    handleInputChange('commune', value);
-  };
-
   console.log('StepTwoTransfer render - receiverDetails:', receiverDetails);
 
-  const isMonCashOrNatCash = transferDetails?.deliveryMethod === 'moncash' || transferDetails?.deliveryMethod === 'natcash';
-  const paymentMethod = transferDetails?.deliveryMethod === 'moncash' ? 'MonCash' : 'NatCash';
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleInputChange = (field: keyof ReceiverDetails, value: string) => {
+    const updatedDetails = { ...receiverDetails, [field]: value };
+    onReceiverDetailsChange(updatedDetails);
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      const newErrors = { ...errors };
+      delete newErrors[field];
+      setErrors(newErrors);
+    }
+  };
+
+  const handleDepartmentChange = (department: string) => {
+    const updatedDetails = { 
+      ...receiverDetails, 
+      department,
+      commune: '' // Reset commune when department changes
+    };
+    onReceiverDetailsChange(updatedDetails);
+    
+    if (errors.department) {
+      const newErrors = { ...errors };
+      delete newErrors.department;
+      setErrors(newErrors);
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!receiverDetails.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
+
+    if (!receiverDetails.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+
+    if (!receiverDetails.phoneNumber.trim()) {
+      newErrors.phoneNumber = 'Phone number is required';
+    }
+
+    if (!receiverDetails.department) {
+      newErrors.department = 'Department is required';
+    }
+
+    if (!receiverDetails.commune) {
+      newErrors.commune = 'Commune is required';
+    }
+
+    // MonCash phone validation for cash pickup
+    if (transferDetails.deliveryMethod === 'cash-pickup' && !receiverDetails.moncashPhoneNumber.trim()) {
+      newErrors.moncashPhoneNumber = 'MonCash phone number is required for cash pickup';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      onNext();
+    }
+  };
+
+  const availableCommunes = receiverDetails.department ? COMMUNES_BY_DEPARTMENT[receiverDetails.department] || [] : [];
 
   return (
-    <div className="">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-3 text-center">
-          <h2 className="text-2xl font-bold text-gray-800 mb-1">Receiver Details</h2>
-          <p className="text-gray-600">Please provide the recipient's information</p>
+    <div className="space-y-6">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          Receiver Information
+        </h2>
+        <p className="text-gray-600">
+          Enter the details of the person receiving the money
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {/* Name Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="firstName">First Name *</Label>
+            <Input
+              id="firstName"
+              type="text"
+              value={receiverDetails.firstName}
+              onChange={(e) => handleInputChange('firstName', e.target.value)}
+              placeholder="Enter first name"
+              className={errors.firstName ? 'border-red-500' : ''}
+            />
+            {errors.firstName && (
+              <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="lastName">Last Name *</Label>
+            <Input
+              id="lastName"
+              type="text"
+              value={receiverDetails.lastName}
+              onChange={(e) => handleInputChange('lastName', e.target.value)}
+              placeholder="Enter last name"
+              className={errors.lastName ? 'border-red-500' : ''}
+            />
+            {errors.lastName && (
+              <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+            )}
+          </div>
         </div>
 
-        <div className="space-y-2">
-            {/* Personal Information Fields */}
-            <div className="space-y-2">
-              <h3 className="text-lg font-medium text-gray-800 mb-1 pb-1">Personal Information</h3>
+        {/* Phone Number */}
+        <div>
+          <Label htmlFor="phoneNumber">Phone Number *</Label>
+          <PhoneInput
+            value={receiverDetails.phoneNumber}
+            onChange={(value) => handleInputChange('phoneNumber', value || '')}
+            defaultCountry="HT"
+            placeholder="Enter phone number"
+            className={errors.phoneNumber ? 'border-red-500' : ''}
+          />
+          {errors.phoneNumber && (
+            <p className="text-red-500 text-sm mt-1">{errors.phoneNumber}</p>
+          )}
+        </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-base font-medium text-gray-700">
-                  What's their full name?
-                </Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    id="firstName"
-                    type="text"
-                    placeholder="First name"
-                    value={receiverDetails.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                  <Input
-                    id="lastName"
-                    type="text"
-                    placeholder="Last name"
-                    value={receiverDetails.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
+        {/* Location Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="department">Department *</Label>
+            <Select value={receiverDetails.department} onValueChange={handleDepartmentChange}>
+              <SelectTrigger className={errors.department ? 'border-red-500' : ''}>
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent>
+                {HAITI_DEPARTMENTS.map((dept) => (
+                  <SelectItem key={dept} value={dept}>
+                    {dept}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.department && (
+              <p className="text-red-500 text-sm mt-1">{errors.department}</p>
+            )}
+          </div>
 
-              {/* Conditionally render regular phone number field - hide for MonCash/NatCash */}
-              {!isMonCashOrNatCash && (
-                <div className="space-y-2">
-                  <Label htmlFor="phoneNumber" className="text-base font-medium text-gray-700">
-                    What's their phone number?
-                  </Label>
-                  <div className="flex">
-                    <div className="flex items-center px-3 border border-r-0 border-gray-300 bg-gradient-to-r from-gray-50 to-gray-100 rounded-l-lg">
-                      <span className="text-sm text-gray-600 font-medium">+509</span>
-                    </div>
-                    <Input
-                      id="phoneNumber"
-                      type="tel"
-                      placeholder="Enter phone number"
-                      value={receiverDetails.phoneNumber}
-                      onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-                      className="rounded-l-none border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
+          <div>
+            <Label htmlFor="commune">Commune *</Label>
+            <Select 
+              value={receiverDetails.commune} 
+              onValueChange={(value) => handleInputChange('commune', value)}
+              disabled={!receiverDetails.department}
+            >
+              <SelectTrigger className={errors.commune ? 'border-red-500' : ''}>
+                <SelectValue placeholder="Select commune" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableCommunes.map((commune) => (
+                  <SelectItem key={commune} value={commune}>
+                    {commune}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.commune && (
+              <p className="text-red-500 text-sm mt-1">{errors.commune}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Email (Optional) */}
+        <div>
+          <Label htmlFor="email">Email (Optional)</Label>
+          <Input
+            id="email"
+            type="email"
+            value={receiverDetails.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            placeholder="Enter email address"
+          />
+        </div>
+
+        {/* MonCash Phone for Cash Pickup */}
+        {transferDetails.deliveryMethod === 'cash-pickup' && (
+          <>
+            <Separator />
+            <div>
+              <Label htmlFor="moncashPhone">MonCash Phone Number *</Label>
+              <PhoneInput
+                value={receiverDetails.moncashPhoneNumber}
+                onChange={(value) => handleInputChange('moncashPhoneNumber', value || '')}
+                defaultCountry="HT"
+                placeholder="Enter MonCash phone number"
+                className={errors.moncashPhoneNumber ? 'border-red-500' : ''}
+              />
+              {errors.moncashPhoneNumber && (
+                <p className="text-red-500 text-sm mt-1">{errors.moncashPhoneNumber}</p>
               )}
-
-              {/* MonCash/NatCash Phone Number Field */}
-              {isMonCashOrNatCash && (
-                <div className="space-y-2">
-                  <Label htmlFor="moncashPhoneNumber" className="text-base font-medium text-gray-700">
-                    What's their {paymentMethod} phone number?
-                  </Label>
-                  <div className="flex">
-                    <div className="flex items-center px-3 border border-r-0 border-gray-300 bg-gradient-to-r from-gray-50 to-gray-100 rounded-l-lg">
-                      <span className="text-sm text-gray-600 font-medium">+509</span>
-                    </div>
-                    <Input
-                      id="moncashPhoneNumber"
-                      type="tel"
-                      placeholder={`Enter ${paymentMethod} phone number`}
-                      value={receiverDetails.moncashPhoneNumber || ''}
-                      onChange={(e) => handleInputChange('moncashPhoneNumber', e.target.value)}
-                      className="rounded-l-none border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  {/* Notice about account eligibility */}
-                  <div className="flex items-start space-x-2 p-2 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg">
-                    <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
-                    <div className="text-sm text-amber-800">
-                      <p className="font-medium mb-1">Important Notice</p>
-                      <p>
-                        Please ensure the {paymentMethod} phone number is eligible to receive payments and the account is upgraded. 
-                        Unverified or basic accounts may not be able to receive transfers.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <p className="text-sm text-gray-600 mt-1">
+                The receiver will receive the money directly in their MonCash account
+              </p>
             </div>
+          </>
+        )}
+      </div>
 
-
-        </div>
+      {/* Navigation Buttons */}
+      <div className="flex gap-4 pt-6">
+        <Button
+          variant="outline"
+          onClick={onBack}
+          className="flex-1"
+        >
+          Back
+        </Button>
+        <Button
+          onClick={handleNext}
+          className="flex-1 bg-red-500 hover:bg-red-600"
+        >
+          Continue
+        </Button>
       </div>
     </div>
   );
 };
+
+export default StepTwoTransfer;
