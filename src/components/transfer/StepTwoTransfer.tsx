@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -49,20 +48,20 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
                        receiverDetails.phoneNumber.trim().length > 0);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col px-4">
+    <div className="min-h-screen bg-white flex flex-col px-0"> {/* Reduced padding here */}
       {/* Main Content */}
       <div className="flex-1 flex flex-col w-full max-w-md mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-medium text-gray-900 mb-1">
             Who's receiving this?
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm text-gray-600">
             Please provide the recipient's information
           </p>
         </div>
 
         {/* Form Fields */}
-        <div className="space-y-4 mb-8">
+        <div className="space-y-3 mb-6">
           {/* First Name and Last Name */}
           <div className="grid grid-cols-2 gap-4">
             {/* First Name */}
@@ -173,7 +172,6 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
           </div>
         )}
 
-        
       </div>
     </div>
   );
