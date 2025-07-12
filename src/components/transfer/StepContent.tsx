@@ -160,20 +160,11 @@ const StepContent: React.FC<StepContentProps> = ({
       )}
 
       {currentStep === 3 && (
-        <div className="space-y-4">
-          <div className="text-center">
-            <h1 className="text-2xl font-medium text-gray-900 mb-1">
-              Who's receiving this?
-            </h1>
-            <p className="text-sm text-gray-600">Please provide the recipient's information</p>
-          </div>
-
-          <StepTwoTransfer
-            receiverDetails={transferData.receiverDetails}
-            onDetailsChange={(receiverDetails) => updateTransferData({ receiverDetails })}
-            transferDetails={transferData.transferDetails}
-          />
-        </div>
+        <StepTwoTransfer
+          receiverDetails={transferData.receiverDetails}
+          onDetailsChange={(receiverDetails) => updateTransferData({ receiverDetails })}
+          transferDetails={transferData.transferDetails}
+        />
       )}
 
       {currentStep === 4 && (
