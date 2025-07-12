@@ -66,8 +66,7 @@ function MainLayoutContent() {
     <div className="min-h-screen flex flex-col bg-white">
       <style dangerouslySetInnerHTML={{ __html: headerHeightStyle }} />
 
-      {/* Render appropriate header based on device - hide on components page */}
-      {!isComponentsPage && (isMobile ? <PremiumBankingHeader /> : <DesktopHeader />)}
+      {/* Header removed per user request */}
 
       <main className={`flex-grow relative ${isMobile ? '' : 'min-h-screen'}`} style={{ paddingBottom: getBottomPadding() }}>
         <Outlet />

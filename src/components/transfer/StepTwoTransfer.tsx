@@ -1,13 +1,15 @@
 
 import React, { useState } from 'react';
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import { ArrowLeft, User, Phone, AlertCircle } from 'lucide-react';
 
 interface ReceiverDetails {
   firstName: string;
   lastName: string;
   phoneNumber: string;
+  department: string;
+  commune: string;
   email?: string;
   moncashPhoneNumber?: string;
 }
