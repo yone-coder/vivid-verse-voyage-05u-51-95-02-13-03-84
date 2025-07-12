@@ -5,11 +5,13 @@ import StepOneTransfer from './StepOneTransfer';
 import StepOneLocalTransfer from './StepOneLocalTransfer';
 import StepOnePointFiveTransfer from './StepOnePointFiveTransfer';
 import StepTwoTransfer from './StepTwoTransfer';
+import StepTwoPointFiveTransfer from './StepTwoPointFiveTransfer';
 import TransferSummary from './TransferSummary';
 import PaymentMethodSelection from './PaymentMethodSelection';
 import PaymentMethodSelector from './PaymentMethodSelector';
 import TransferReceipt from './TransferReceipt';
 import { Button } from "@/components/ui/button";
+import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface StepContentProps {
@@ -23,6 +25,9 @@ interface StepContentProps {
   userEmail: string;
   receiptRef: React.RefObject<HTMLDivElement>;
   generateReceiptImage: () => void;
+  onNextStep: () => void;
+  onPreviousStep: () => void;
+  canProceed: boolean;
 }
 
 const StepContent: React.FC<StepContentProps> = ({
@@ -35,7 +40,10 @@ const StepContent: React.FC<StepContentProps> = ({
   transactionId,
   userEmail,
   receiptRef,
-  generateReceiptImage
+  generateReceiptImage,
+  onNextStep,
+  onPreviousStep,
+  canProceed
 }) => {
   const navigate = useNavigate();
 
@@ -47,13 +55,75 @@ const StepContent: React.FC<StepContentProps> = ({
     }
   }, [currentStep, transferData]);
 
+  // Helper function to get button text based on step
+  const getButtonText = () => {
+    if (currentStep === 7) {
+      if (isPaymentLoading) {
+        return transferData.transferType === 'national' ? 'Processing MonCash Payment...' : 'Processing...';
+      }
+      return transferData.transferType === 'national' 
+        ? `Pay HTG ${(parseFloat(transferData.amount) * 127.5).toFixed(2)} with MonCash`
+        : `Pay $${(parseFloat(transferData.amount) + Math.ceil(parseFloat(transferData.amount) / 100) * 15).toFixed(2)}`;
+    }
+    if (currentStep === 1) return 'Continue';
+    if (currentStep === 8) return 'Done';
+    return 'Next';
+  };
+
+  // Helper function to get button color based on step
+  const getButtonColor = () => {
+    if (currentStep === 7) {
+      return transferData.transferType === 'national' 
+        ? 'bg-red-600 hover:bg-red-700' 
+        : 'bg-green-600 hover:bg-green-700';
+    }
+    return 'bg-slate-500 hover:bg-slate-600';
+  };
+
+  // Helper function to render sticky continue buttons for steps 1-7
+  const renderContinueButtons = () => {
+    if (currentStep >= 8) return null; // No buttons for final step
+
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-4 py-3 shadow-lg">
+        <div className="flex items-center gap-3 max-w-md mx-auto">
+          {/* Back Button */}
+          {currentStep > 1 && (
+            <button 
+              onClick={onPreviousStep}
+              className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors duration-200"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+          )}
+          
+          {/* Continue/Pay Button */}
+          <Button 
+            onClick={currentStep === 7 ? onPaymentSubmit : onNextStep}
+            disabled={
+              !canProceed || 
+              isPaymentLoading || 
+              (currentStep === 7 && transferData.transferType === 'international' && !isPaymentFormValid)
+            }
+            className={`flex-1 h-12 rounded-full font-semibold text-white transition-colors duration-200 ${getButtonColor()}`}
+          >
+            {getButtonText()}
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="px-4 py-4">
       {currentStep === 1 && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="space-y-4">
             <div className="text-center">
-              <p className="text-gray-600">Enter the amount you want to send</p>
+              <h1 className="text-2xl font-medium text-gray-900 mb-1">
+                How much are you sending?
+              </h1>
+              <p className="text-sm text-gray-600">Enter the amount you want to send</p>
             </div>
 
             {transferData.transferType === 'national' ? (
@@ -73,10 +143,15 @@ const StepContent: React.FC<StepContentProps> = ({
 
       {currentStep === 2 && (
         <div className="space-y-4">
-          <div className="text-center mb-4">
-            <p className="text-gray-600">Choose transfer details</p>
+          <div className="text-center">
+            <h1 className="text-2xl font-medium text-gray-900 mb-1">
+              How should they receive it?
+            </h1>
+            <p className="text-sm text-gray-600">
+              Choose your preferred delivery method
+            </p>
           </div>
-
+          
           <StepOnePointFiveTransfer
             transferDetails={transferData.transferDetails}
             onTransferDetailsChange={(transferDetails) => updateTransferData({ transferDetails })}
@@ -86,8 +161,11 @@ const StepContent: React.FC<StepContentProps> = ({
 
       {currentStep === 3 && (
         <div className="space-y-4">
-          <div className="text-center mb-4">
-            <p className="text-gray-600">Who are you sending ${transferData.amount} to?</p>
+          <div className="text-center">
+            <h1 className="text-2xl font-medium text-gray-900 mb-1">
+              Who's receiving this?
+            </h1>
+            <p className="text-sm text-gray-600">Please provide the recipient's information</p>
           </div>
 
           <StepTwoTransfer
@@ -100,8 +178,27 @@ const StepContent: React.FC<StepContentProps> = ({
 
       {currentStep === 4 && (
         <div className="space-y-4">
+          <div className="text-center">
+            <h1 className="text-2xl font-medium text-gray-900 mb-1">
+              Where should we deliver it?
+            </h1>
+            <p className="text-sm text-gray-600">Complete the delivery address details</p>
+          </div>
+
+          <StepTwoPointFiveTransfer
+            receiverDetails={transferData.receiverDetails}
+            onDetailsChange={(receiverDetails) => updateTransferData({ receiverDetails })}
+          />
+        </div>
+      )}
+
+      {currentStep === 5 && (
+        <div className="space-y-4">
           <div className="text-center mb-4">
-            <p className="text-gray-600">Review your transfer details</p>
+            <h1 className="text-2xl font-medium text-gray-900 mb-1">
+              Does everything look right?
+            </h1>
+            <p className="text-sm text-gray-600">Review your transfer details before proceeding</p>
           </div>
 
           <TransferSummary
@@ -121,8 +218,17 @@ const StepContent: React.FC<StepContentProps> = ({
         </div>
       )}
 
-      {currentStep === 5 && (
+      {currentStep === 6 && (
         <div className="space-y-4">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-medium text-gray-900 mb-1">
+              How would you like to pay?
+            </h1>
+            <p className="text-sm text-gray-600">
+              Choose your preferred payment method
+            </p>
+          </div>
+          
           <PaymentMethodSelection
             selectedMethod={transferData.selectedPaymentMethod || 'credit-card'}
             onMethodSelect={(method) => updateTransferData({ selectedPaymentMethod: method })}
@@ -131,7 +237,7 @@ const StepContent: React.FC<StepContentProps> = ({
         </div>
       )}
 
-      {currentStep === 6 && (
+      {currentStep === 7 && (
         <PaymentMethodSelector
           transferData={transferData}
           onPaymentSubmit={onPaymentSubmit}
@@ -140,7 +246,7 @@ const StepContent: React.FC<StepContentProps> = ({
         />
       )}
 
-      {currentStep === 7 && (
+      {currentStep === 8 && (
         <div className="space-y-4">
           <TransferReceipt
             ref={receiptRef}
@@ -166,6 +272,9 @@ const StepContent: React.FC<StepContentProps> = ({
           </div>
         </div>
       )}
+
+      {/* Continue Buttons for all steps except final receipt step */}
+      {renderContinueButtons()}
     </div>
   );
 };
