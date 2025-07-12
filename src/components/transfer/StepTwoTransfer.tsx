@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 import { ArrowLeft, User, Phone, AlertCircle } from 'lucide-react';
 
 interface ReceiverDetails {
@@ -47,29 +48,6 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
 
   return (
     <div className="min-h-screen bg-white flex flex-col px-4">
-      {/* Header */}
-      <div className="pt-2 pb-3 flex items-center justify-between">
-        {onBack && (
-          <button
-            onClick={onBack}
-            className="flex items-center justify-center w-10 h-10 hover:bg-gray-100 rounded-full transition-colors active:scale-95"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-700" />
-          </button>
-        )}
-        <h2 className="text-lg font-semibold text-gray-900">Receiver Details</h2>
-        <div className="w-10 h-10"></div>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="mb-6 px-0">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="flex-1 h-1 bg-red-500 rounded-full"></div>
-          <div className="flex-1 h-1 bg-red-500 rounded-full"></div>
-          <div className="flex-1 h-1 bg-gray-300 rounded-full"></div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col w-full max-w-md mx-auto">
         <div className="text-center mb-8">
@@ -83,43 +61,46 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
 
         {/* Form Fields */}
         <div className="space-y-4 mb-8">
-          {/* First Name */}
-          <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-              First Name
-            </label>
-            <div className="relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
-                <User className="w-5 h-5 text-gray-400" />
+          {/* First Name and Last Name */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* First Name */}
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                First Name
+              </label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
+                  <User className="w-5 h-5 text-gray-400" />
+                </div>
+                <Input
+                  id="firstName"
+                  type="text"
+                  value={receiverDetails.firstName}
+                  onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  placeholder="Enter first name"
+                  className="pl-10"
+                />
               </div>
-              <Input
-                id="firstName"
-                type="text"
-                value={receiverDetails.firstName}
-                onChange={(e) => handleInputChange('firstName', e.target.value)}
-                placeholder="Enter first name"
-                className="pl-10"
-              />
             </div>
-          </div>
 
-          {/* Last Name */}
-          <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-              Last Name
-            </label>
-            <div className="relative">
-              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
-                <User className="w-5 h-5 text-gray-400" />
+            {/* Last Name */}
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                Last Name
+              </label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
+                  <User className="w-5 h-5 text-gray-400" />
+                </div>
+                <Input
+                  id="lastName"
+                  type="text"
+                  value={receiverDetails.lastName}
+                  onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  placeholder="Enter last name"
+                  className="pl-10"
+                />
               </div>
-              <Input
-                id="lastName"
-                type="text"
-                value={receiverDetails.lastName}
-                onChange={(e) => handleInputChange('lastName', e.target.value)}
-                placeholder="Enter last name"
-                className="pl-10"
-              />
             </div>
           </div>
 
@@ -190,17 +171,7 @@ const StepTwoTransfer: React.FC<StepTwoTransferProps> = ({
           </div>
         )}
 
-        {/* Continue Button */}
-        {onContinue && (
-          <Button
-            onClick={onContinue}
-            disabled={!isFormValid}
-            className="w-full mb-6"
-            size="lg"
-          >
-            Continue
-          </Button>
-        )}
+        
       </div>
     </div>
   );
