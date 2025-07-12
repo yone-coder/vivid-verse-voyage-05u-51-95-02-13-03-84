@@ -19,37 +19,41 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
   ];
 
   return (
-    <div className="bg-white px-4 pt-4 pb-3">
-      <div className="space-y-3">
-        {/* Multiple Progress Bars */}
-        <div className="space-y-2">
-          <div className="flex gap-1">
-            {Array.from({ length: totalSteps }, (_, index) => {
-              const stepNumber = index + 1;
-              const isCompleted = stepNumber < currentStep;
-              const isCurrent = stepNumber === currentStep;
-              
-              return (
-                <div
-                  key={stepNumber}
-                  className={`flex-1 h-2 rounded-full transition-all duration-500 ease-in-out ${
-                    isCompleted || isCurrent
-                      ? 'bg-red-600'
-                      : 'bg-gray-200'
-                  }`}
-                />
-              );
-            })}
+    <div className="bg-white border-b border-gray-200 shadow-sm">
+      <div className="px-4 py-4">
+        <div className="space-y-4">
+          {/* Header with Step Title */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">
+                {stepTitles[currentStep - 1]}
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Step {currentStep} of {totalSteps}
+              </p>
+            </div>
           </div>
           
-          {/* Current Step Info */}
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-600">
-              Step {currentStep} of {totalSteps}
-            </span>
-            <span className="font-medium text-red-600">
-              {stepTitles[currentStep - 1]}
-            </span>
+          {/* Progress Bar */}
+          <div className="space-y-2">
+            <div className="flex gap-1">
+              {Array.from({ length: totalSteps }, (_, index) => {
+                const stepNumber = index + 1;
+                const isCompleted = stepNumber < currentStep;
+                const isCurrent = stepNumber === currentStep;
+                
+                return (
+                  <div
+                    key={stepNumber}
+                    className={`flex-1 h-2 rounded-full transition-all duration-500 ease-in-out ${
+                      isCompleted || isCurrent
+                        ? 'bg-red-600'
+                        : 'bg-gray-200'
+                    }`}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

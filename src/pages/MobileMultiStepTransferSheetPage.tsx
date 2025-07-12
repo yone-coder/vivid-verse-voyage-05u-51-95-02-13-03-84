@@ -7,7 +7,7 @@ import TransferTypeSelector from '@/components/transfer/TransferTypeSelector';
 import { EmailNotificationService } from '@/components/transfer/EmailNotificationService';
 import IndexBottomNav from '@/components/layout/IndexBottomNav';
 import PaymentLoadingOverlay from '@/components/transfer/PaymentLoadingOverlay';
-import TransferHeader from '@/components/transfer/TransferHeader';
+
 import StepIndicator from '@/components/transfer/StepIndicator';
 import StepContent from '@/components/transfer/StepContent';
 import TransferHistoryService from '@/services/transferHistoryService';
@@ -349,15 +349,13 @@ const MobileMultiStepTransferSheetPage: React.FC<MobileMultiStepTransferSheetPag
     <div className="min-h-screen bg-white">
       <PaymentLoadingOverlay isVisible={isPaymentLoading} />
 
-      {/* Main Header - sticky */}
+      {/* Step Indicator as Header - sticky */}
       <div className="sticky top-0 z-[9999] bg-white">
-        <TransferHeader />
+        <StepIndicator currentStep={currentStep} />
       </div>
 
-      {/* Step Indicator and Transfer Type Selector - sticky below header */}
-      <div className="sticky top-[60px] z-[9998] bg-white">
-        {/* Step Indicator */}
-        <StepIndicator currentStep={currentStep} />
+      {/* Transfer Type Selector - sticky below step indicator */}
+      <div className="sticky top-[100px] z-[9998] bg-white">
 
         {/* Transfer Type Selector - Only show on step 1 */}
         {currentStep === 1 && (
