@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import TransferTypeSelector from '@/components/transfer/TransferTypeSelector';
 import { EmailNotificationService } from '@/components/transfer/EmailNotificationService';
-import IndexBottomNav from '@/components/layout/IndexBottomNav';
+
 import PaymentLoadingOverlay from '@/components/transfer/PaymentLoadingOverlay';
 
 import StepIndicator from '@/components/transfer/StepIndicator';
@@ -149,7 +149,7 @@ const MobileMultiStepTransferSheetPage: React.FC<MobileMultiStepTransferSheetPag
       setPaymentCompleted(true);
       const actualTransactionId = orderDetails?.id || `TX${Date.now()}`;
       setTransactionId(actualTransactionId);
-      setCurrentStep(7); // Set to step 7 for receipt
+      setCurrentStep(8); // Set to step 8 for receipt
       setIsPaymentLoading(false);
 
       // Save transfer to history
@@ -201,7 +201,7 @@ const MobileMultiStepTransferSheetPage: React.FC<MobileMultiStepTransferSheetPag
     console.log(`Attempting to move from step ${currentStep} to step ${currentStep + 1}`);
     console.log('Can proceed:', canProceed);
     
-    if (currentStep < 7 && canProceed) {
+    if (currentStep < 8 && canProceed) {
       setCurrentStep(currentStep + 1);
       console.log(`Successfully moved to step ${currentStep + 1}`);
     } else {
@@ -287,19 +287,23 @@ const MobileMultiStepTransferSheetPage: React.FC<MobileMultiStepTransferSheetPag
   const canProceedFromStep3 = Boolean(
     transferData.receiverDetails.firstName &&
     transferData.receiverDetails.lastName &&
-    transferData.receiverDetails.commune &&
     // Check for appropriate phone number based on delivery method
     (transferData.transferDetails.deliveryMethod === 'moncash' || transferData.transferDetails.deliveryMethod === 'natcash' 
       ? transferData.receiverDetails.moncashPhoneNumber 
       : transferData.receiverDetails.phoneNumber)
   );
   
-  const canProceedFromStep4 = true; // Review step should always allow proceeding
-  const canProceedFromStep5 = Boolean(
+  const canProceedFromStep4 = Boolean(
+    transferData.receiverDetails.department &&
+    transferData.receiverDetails.commune
+  );
+  
+  const canProceedFromStep5 = true; // Review step should always allow proceeding
+  const canProceedFromStep6 = Boolean(
     transferData.selectedPaymentMethod !== undefined && 
     transferData.selectedPaymentMethod !== ''
   );
-  const canProceedFromStep6 = Boolean(
+  const canProceedFromStep7 = Boolean(
     transferData.selectedPaymentMethod !== undefined && 
     transferData.selectedPaymentMethod !== ''
   );
@@ -311,7 +315,8 @@ const MobileMultiStepTransferSheetPage: React.FC<MobileMultiStepTransferSheetPag
     (currentStep === 3 && canProceedFromStep3) ||
     (currentStep === 4 && canProceedFromStep4) ||
     (currentStep === 5 && canProceedFromStep5) ||
-    (currentStep === 6 && canProceedFromStep6)
+    (currentStep === 6 && canProceedFromStep6) ||
+    (currentStep === 7 && canProceedFromStep7)
   );
 
   // Debug logging for canProceed logic
@@ -351,7 +356,7 @@ const MobileMultiStepTransferSheetPage: React.FC<MobileMultiStepTransferSheetPag
 
       {/* Step Indicator as Header - sticky */}
       <div className="sticky top-0 z-[9999] bg-white">
-        <StepIndicator currentStep={currentStep} />
+        <StepIndicator currentStep={currentStep} onBack={handlePreviousStep} />
       </div>
 
       {/* Transfer Type Selector - sticky below step indicator */}
@@ -369,8 +374,8 @@ const MobileMultiStepTransferSheetPage: React.FC<MobileMultiStepTransferSheetPag
         )}
       </div>
 
-      {/* Step Content - Reduced bottom padding since button is now in nav */}
-      <div className="flex-1 overflow-y-auto pb-16">
+      {/* Step Content - Add bottom padding for sticky buttons */}
+      <div className="flex-1 overflow-y-auto pb-20">
         <StepContent
           currentStep={currentStep}
           transferData={transferData}
@@ -382,20 +387,11 @@ const MobileMultiStepTransferSheetPage: React.FC<MobileMultiStepTransferSheetPag
           userEmail={userEmail}
           receiptRef={receiptRef}
           generateReceiptImage={generateReceiptImage}
+          onNextStep={handleNextStep}
+          onPreviousStep={handlePreviousStep}
+          canProceed={canProceed}
         />
       </div>
-
-      {/* Index Bottom Navigation with integrated continue button */}
-      <IndexBottomNav
-        showContinueButton={currentStep < 7}
-        currentStep={currentStep}
-        canProceed={canProceed}
-        onContinue={currentStep === 6 ? handleStickyPayment : handleNextStep}
-        onPrevious={handlePreviousStep}
-        isPaymentLoading={isPaymentLoading}
-        transferData={transferData}
-        isPaymentFormValid={isPaymentFormValid}
-      />
     </div>
   );
 };
