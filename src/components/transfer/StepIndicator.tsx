@@ -19,7 +19,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
   ];
 
   return (
-    <div className="bg-white border-b border-gray-200 shadow-sm">
+    <div className="bg-white">
       <div className="px-4 py-4">
         <div className="space-y-4">
           {/* Header with Step Title */}
