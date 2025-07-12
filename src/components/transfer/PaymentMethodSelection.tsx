@@ -1,139 +1,113 @@
+import React, { useEffect } from 'react';
+import { TransferData } from '@/pages/MobileMultiStepTransferSheetPage';
+import PaymentHeader from './PaymentHeader';
+import MonCashPaymentInfo from './MonCashPaymentInfo';
+import PayPalCheckoutForm from './PayPalCheckoutForm';
 
-import React from 'react';
-import { CreditCard, Building, Smartphone, DollarSign } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-
-interface PaymentMethodSelectionProps {
-  selectedMethod: string;
-  onMethodSelect: (method: string) => void;
-  transferType?: 'national' | 'international';
+interface PaymentMethodSelectorProps {
+  transferData: TransferData;
+  onPaymentSubmit: () => void;
+  isPaymentLoading: boolean;
+  isPaymentFormValid: boolean;
 }
 
-const PaymentMethodSelection: React.FC<PaymentMethodSelectionProps> = ({
-  selectedMethod,
-  onMethodSelect,
-  transferType = 'international'
+const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
+  transferData,
+  onPaymentSubmit,
+  isPaymentLoading,
+  isPaymentFormValid
 }) => {
-  // Payment methods for international transfers
-  const internationalPaymentMethods = [
-    {
-      id: 'credit-card',
-      title: 'Credit/Debit Card',
-      description: 'Visa, Mastercard, American Express',
-      icon: CreditCard,
-      popular: true
-    },
-    {
-      id: 'bank-account',
-      title: 'ACH / Bank Account',
-      description: 'Direct bank transfer',
-      icon: Building,
-      popular: false
-    },
-    {
-      id: 'mobile-pay',
-      title: 'Apple Pay / Google Pay',
-      description: 'Quick mobile payment',
-      icon: Smartphone,
-      popular: false
-    },
-    {
-      id: 'paypal',
-      title: 'PayPal',
-      description: 'Pay with your PayPal account',
-      icon: DollarSign,
-      popular: false
-    }
-  ];
+  const receiverAmount = transferData.amount ? (parseFloat(transferData.amount) * 127.5).toFixed(2) : '0.00';
+  const receiverName = `${transferData.receiverDetails.firstName} ${transferData.receiverDetails.lastName}`;
 
-  // Payment methods for national transfers
-  const nationalPaymentMethods = [
-    {
-      id: 'moncash',
-      title: 'MonCash',
-      description: 'Pay with your MonCash mobile wallet',
-      icon: Smartphone,
-      popular: true
-    },
-    {
-      id: 'natcash',
-      title: 'NatCash',
-      description: 'Pay with your NatCash account',
-      icon: DollarSign,
-      popular: false
-    }
-  ];
+  // Listen for form validation changes
+  useEffect(() => {
+    const handleFormValidation = (event: any) => {
+      // Handle validation if needed
+    };
 
-  const paymentMethods = transferType === 'national' ? nationalPaymentMethods : internationalPaymentMethods;
+    const handleEmailCapture = (event: any) => {
+      // Handle email capture if needed
+    };
+
+    const handlePaymentSuccess = (event: any) => {
+      // Handle payment success if needed
+    };
+
+    const handlePaymentError = (event: any) => {
+      // Handle payment error if needed
+    };
+
+    window.addEventListener('paymentFormValidation', handleFormValidation);
+    window.addEventListener('emailCaptured', handleEmailCapture);
+    window.addEventListener('paymentSuccess', handlePaymentSuccess);
+    window.addEventListener('paymentError', handlePaymentError);
+
+    return () => {
+      window.removeEventListener('paymentFormValidation', handleFormValidation);
+      window.removeEventListener('emailCaptured', handleEmailCapture);
+      window.removeEventListener('paymentSuccess', handlePaymentSuccess);
+      window.removeEventListener('paymentError', handlePaymentError);
+    };
+  }, []);
 
   return (
     <div className="space-y-4">
-      <div className="text-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          How would you like to pay?
-        </h3>
-        <p className="text-gray-600">
-          Choose your preferred payment method
+      <div className="text-center">
+        <h1 className="text-2xl font-medium text-gray-900 mb-1">
+          Complete your payment
+        </h1>
+        <p className="text-sm text-gray-600">
+          {transferData.transferType === 'national' 
+            ? 'Follow the MonCash instructions to complete your transfer'
+            : 'Enter your payment details to complete the transfer'
+          }
         </p>
       </div>
 
-      <div className="space-y-3">
-        {paymentMethods.map((method) => {
-          const IconComponent = method.icon;
-          return (
-            <Card
-              key={method.id}
-              className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                selectedMethod === method.id
-                  ? 'border-red-500 bg-red-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-              onClick={() => onMethodSelect(method.id)}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${
-                      selectedMethod === method.id
-                        ? 'bg-red-100 text-red-600'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      <IconComponent className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium text-gray-900">
-                          {method.title}
-                        </span>
-                        {method.popular && (
-                          <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
-                            Popular
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-500 mt-1">
-                        {method.description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className={`w-4 h-4 rounded-full border-2 ${
-                    selectedMethod === method.id
-                      ? 'border-red-500 bg-red-500'
-                      : 'border-gray-300'
-                  }`}>
-                    {selectedMethod === method.id && (
-                      <div className="w-full h-full rounded-full bg-white transform scale-50"></div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+      {transferData.selectedPaymentMethod === 'moncash' && transferData.transferType === 'national' ? (
+        <PaymentHeader
+          transferType={transferData.transferType}
+          amount={transferData.amount}
+          receiverAmount={receiverAmount}
+          receiverName={receiverName}
+        />
+      ) : (
+        <PaymentHeader
+          transferType={transferData.transferType}
+          amount={transferData.amount}
+          receiverAmount={receiverAmount}
+          receiverName={receiverName}
+        />
+      )}
+
+      {transferData.transferType === 'national' ? (
+        <MonCashPaymentInfo
+          receiverAmount={receiverAmount}
+          receiverName={receiverName}
+        />
+      ) : (
+        <div className="space-y-3">
+          {/* PayPal Checkout Container (Form) */}
+          <PayPalCheckoutForm
+            transferAmount={transferData.amount}
+            onFormValidation={(isValid) => {
+              // Handle form validation
+            }}
+            onEmailCapture={(email) => {
+              // Handle email capture
+            }}
+            onPaymentSuccess={(orderDetails) => {
+              // Handle payment success
+            }}
+            onPaymentError={(message) => {
+              // Handle payment error
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
 
-export default PaymentMethodSelection;
+export default PaymentMethodSelector;
