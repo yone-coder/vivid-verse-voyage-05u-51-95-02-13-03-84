@@ -1,4 +1,3 @@
-
 import React, { forwardRef } from 'react';
 import { CheckCircle, Receipt } from 'lucide-react';
 import { TransferData } from '@/pages/MobileMultiStepTransferSheetPage';
