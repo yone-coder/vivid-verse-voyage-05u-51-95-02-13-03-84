@@ -18,7 +18,7 @@ function MainLayoutContent() {
   const { isAuthenticated, isLoading } = useAuth();
 
   const isHomePage = pathname === "/";
-  const isMultiStepTransfer = pathname.startsWith("/multi-step-transfer");
+  const isMultiStepTransfer = pathname === "/" || pathname === "/transfer" || pathname === "/transfer-sheet";
   const isAccountPage = pathname === "/account";
   const isComponentsPage = pathname === "/components";
 
@@ -75,8 +75,8 @@ function MainLayoutContent() {
       {/* Desktop footer - show for all desktop pages except components */}
       {!isMobile && !isComponentsPage && <DesktopFooter />}
 
-      {/* Mobile bottom navigation - hide on components page */}
-      {isMobile && !isComponentsPage && <IndexBottomNav />}
+      {/* Mobile bottom navigation - hide on components page and multi-step transfer page */}
+      {isMobile && !isComponentsPage && !isMultiStepTransfer && <IndexBottomNav />}
     </div>
   );
 }
