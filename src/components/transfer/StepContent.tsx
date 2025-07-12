@@ -168,19 +168,10 @@ const StepContent: React.FC<StepContentProps> = ({
       )}
 
       {currentStep === 4 && (
-        <div className="space-y-4">
-          <div className="text-center">
-            <h1 className="text-2xl font-medium text-gray-900 mb-1">
-              Where should we deliver it?
-            </h1>
-            <p className="text-sm text-gray-600">Complete the delivery address details</p>
-          </div>
-
-          <StepTwoPointFiveTransfer
-            receiverDetails={transferData.receiverDetails}
-            onDetailsChange={(receiverDetails) => updateTransferData({ receiverDetails })}
-          />
-        </div>
+        <StepTwoPointFiveTransfer
+          receiverDetails={transferData.receiverDetails}
+          onDetailsChange={(receiverDetails) => updateTransferData({ receiverDetails })}
+        />
       )}
 
       {currentStep === 5 && (
